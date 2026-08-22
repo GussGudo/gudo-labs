@@ -1,0 +1,7 @@
+error[E0277]: the trait bound `FenceEpoch: From<u64>` is not satisfied
+ --> tests/compile_fail/12_19_b_primitive_collapse.rs:5:38
+  |
+5 |     let _collapsed: FenceEpoch = raw.into();
+  |                                      ^^^^ the trait `From<u64>` is not implemented for `FenceEpoch`
+  |
+  = note: required for `u64` to implement `Into<FenceEpoch>`

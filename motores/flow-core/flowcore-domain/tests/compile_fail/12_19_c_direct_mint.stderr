@@ -1,0 +1,13 @@
+error[E0603]: module `fence_epoch` is private
+ --> tests/compile_fail/12_19_c_direct_mint.rs:1:22
+  |
+1 | use flowcore_domain::fence_epoch::governance::mint_fence_epoch;
+  |                      ^^^^^^^^^^^  ---------- module `governance` is not publicly re-exported
+  |                      |
+  |                      private module
+  |
+note: the module `fence_epoch` is defined here
+ --> src/lib.rs
+  |
+  | mod fence_epoch;
+  | ^^^^^^^^^^^^^^^
