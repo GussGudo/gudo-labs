@@ -1,1 +1,0 @@
-rd_("oflowcore_domain")

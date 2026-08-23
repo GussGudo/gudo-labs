@@ -1,2 +1,0 @@
-createSrcSidebar('[["flowcore_domain",["",[["governance",[],["mod.rs"]]],["fence_epoch.rs","lib.rs"]]],["flowcore_domain",["",[],["fence_epoch.rs","lib.rs"]]]]');
-//{"start":19,"fragment_lengths":[83,56]}
