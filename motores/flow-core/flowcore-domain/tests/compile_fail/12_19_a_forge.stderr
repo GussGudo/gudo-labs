@@ -1,5 +1,5 @@
-error[E0451]: field `value` of struct `FenceEpoch` is private
+error[E0451]: field `inner` of struct `FenceEpoch` is private
  --> tests/compile_fail/12_19_a_forge.rs:4:32
   |
-4 |     let _forged = FenceEpoch { value: 1 };
+4 |     let _forged = FenceEpoch { inner: 1 };
   |                                ^^^^^ private field

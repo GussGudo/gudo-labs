@@ -1,5 +1,5 @@
-use flowcore_domain::fence_epoch::governance::mint_fence_epoch;
+use flowcore_domain::governance::epoch::mint::mint;
 
 fn main() {
-    let _epoch = mint_fence_epoch(1);
+    let _epoch = mint(1);
 }
