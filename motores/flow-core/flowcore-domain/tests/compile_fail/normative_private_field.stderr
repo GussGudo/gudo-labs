@@ -1,0 +1,7 @@
+error[E0451]: field `_private` of struct `NormativeContent` is private
+ --> tests/compile_fail/normative_private_field.rs:5:9
+  |
+4 |     let _ = NormativeContent {
+  |             ---------------- in this type
+5 |         _private: (),
+  |         ^^^^^^^^ private field
