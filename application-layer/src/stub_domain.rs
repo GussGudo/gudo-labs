@@ -1,5 +1,5 @@
-use std::collections::HashSet;
 use serde::Serialize;
+use std::collections::HashSet;
 
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -72,7 +72,7 @@ pub fn get(scenario_id: &str) -> Option<Scenario> {
             Assignment {
                 assignment_id: "a3".into(),
                 proposal_id: "p1".into(),
-                vehicle_id: "v1".into(), // mismo vehículo que a1, para probar deduplicación
+                vehicle_id: "v1".into(),
                 status: "RECOGNIZED".into(),
                 recognized_at: "2026-11-04T10:07:00Z".into(),
             },
@@ -95,7 +95,6 @@ pub fn active_proposals(s: &Scenario) -> Vec<Proposal> {
         .collect()
 }
 
-// A: filtro estricto
 pub fn active_assignments(s: &Scenario) -> Vec<Assignment> {
     s.assignments
         .iter()
@@ -104,7 +103,6 @@ pub fn active_assignments(s: &Scenario) -> Vec<Assignment> {
         .collect()
 }
 
-// B: deduplicar conservando orden
 pub fn assigned_vehicles(s: &Scenario) -> Vec<String> {
     let mut seen = HashSet::new();
     active_assignments(s)
