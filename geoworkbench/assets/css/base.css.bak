@@ -1,0 +1,30 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: var(--font-ui);
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    font-size: 13px;
+    line-height: 1.5;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Utilidades de Texto */
+.text-warning { color: var(--state-warning); }
+.text-error { color: var(--state-error); }
+.text-accent { color: var(--accent-brand); }
+
+/* Utilidades de Fondo */
+.bg-warning { background-color: var(--state-warning); }
+.bg-accent { background-color: var(--accent-brand); }
+.bg-error { background-color: var(--state-error); }
+
+/* Utilidades de Ancho (Mock) */
+.w-0 { width: 0%; }
+.w-2786 { width: 27.86%; }
+.w-4833 { width: 48.33%; }
+.w-9988 { width: 99.88%; }
+.w-9991 { width: 99.91%; }
+
+/* Utilidad Grid */
+.span-2 { grid-column: span 2; }

@@ -1,0 +1,35 @@
+:root {
+    /* Colores Base */
+    --bg-canvas: #101419;
+    --bg-panel: #181F27;
+    --bg-elevated: #222C36;
+    --border-default: #34414D;
+    
+    /* Texto */
+    --text-primary: #E7EDF2;
+    --text-secondary: #9AA9B6;
+    
+    /* Acentos y Estados */
+    --accent-brand: #55B6A8;
+    --accent-selection: #294C50;
+    --state-success: #65B98A;
+    --state-warning: #E4B65D;
+    --state-error: #D97777;
+    --state-info: #78A9D1;
+
+    /* Tipografía */
+    --font-ui: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    
+    /* Espaciado */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-6: 24px;
+    
+    /* Radios */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+}

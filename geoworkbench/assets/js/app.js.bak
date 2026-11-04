@@ -1,0 +1,227 @@
+import { UIState } from './state/ui-state.js';
+import { EventBus } from './events/event-bus.js';
+import { ScenarioState } from './state/scenario-state.js';
+import { DiagnosticState } from './state/diagnostic-state.js';
+import { Dashboard } from './modules/dashboard.js';
+import { Terminal } from './modules/terminal.js';
+import { dashboardAdapter } from './adapters/dashboard-adapter.js';
+import { terminalAdapter } from './adapters/terminal-adapter.js';
+import { diagnosticCoordinator } from './services/diagnostic-coordinator.js';
+
+class GeoWorkbenchApp {
+    constructor() {
+        this.subscriptions = [];
+        this.abortController = null;
+        this._isInitialized = false;
+        this._lastDashboardViewModel = null;
+        this._lastTerminalViewModel = null;
+    }
+
+    init() {
+        if (this._isInitialized) return;
+        console.log('[App] Iniciando GeoWorkbench...');
+        
+        try {
+            this.abortController = new AbortController();
+            
+            if (!Dashboard.init()) throw new Error('[App] Fallo el módulo Dashboard.');
+            if (!Terminal.init()) throw new Error('[App] Fallo el módulo Terminal.');
+
+            this._bindDomEvents(this.abortController.signal);
+            this._setupSubscriptions();
+
+            this._renderState(UIState); // Pasamos el estado inicial
+
+            this._isInitialized = true;
+            diagnosticCoordinator.log('info', 'App', 'INIT_SUCCESS', 'Aplicación inicializada correctamente.');
+            console.log('[App] Inicialización completada con éxito.');
+
+        } catch (error) {
+            console.error('[App] Error crítico:', error);
+            try { diagnosticCoordinator.log('error', 'App', 'INIT_FAILED', error.message); } catch (e) {}
+            this.destroy(); 
+            throw error; 
+        }
+    }
+
+    _bindDomEvents(signal) {
+        const nav = document.getElementById('zone-nav');
+        if (nav) {
+            nav.addEventListener('click', (e) => {
+                const navItem = e.target.closest('.nav-item');
+                if (!navItem || !nav.contains(navItem)) return;
+
+                let moduleName = navItem.dataset.module;
+                if (!moduleName) {
+                    const textEl = navItem.querySelector('.nav-text');
+                    if (!textEl) return;
+                    moduleName = textEl.textContent.trim().toLowerCase();
+                    const moduleMap = {
+                        'dashboard': 'dashboard', 'mapa': 'map', 'flota': 'fleet',
+                        'paquetes': 'packages', 'asignaciones': 'assignments', 
+                        'rutas': 'routes', 'capacidad': 'capacity', 'validación': 'validation'
+                    };
+                    moduleName = moduleMap[moduleName] || moduleName;
+                }
+                UIState.setActiveModule(moduleName);
+            }, { signal });
+        }
+
+        const actionsContainer = document.querySelector('.actions');
+        if (actionsContainer) {
+            actionsContainer.addEventListener('click', (e) => {
+                const button = e.target.closest('button');
+                if (!button || !actionsContainer.contains(button)) return;
+                
+                const action = button.dataset.action || button.textContent.trim();
+                if (action === 'generate-plan' || action === 'Generar Plan') {
+                    console.log('[App] Solicitud de generación de plan.');
+                }
+            }, { signal });
+        }
+
+        const termFilters = document.querySelector('.term-filters');
+        if (termFilters) {
+            termFilters.addEventListener('click', (e) => {
+                const filterBtn = e.target.closest('.term-filter');
+                if (!filterBtn) return;
+                const text = filterBtn.textContent.trim().toLowerCase();
+                const filterMap = { 'todos': 'all', 'warn': 'warning' };
+                const filterLevel = filterMap[text] || text;
+                UIState.updateTerminalSettings({ activeFilter: filterLevel });
+            }, { signal });
+        }
+
+        const termSearch = document.querySelector('.term-search');
+        if (termSearch) {
+            termSearch.addEventListener('input', (e) => {
+                UIState.updateTerminalSettings({ searchQuery: e.target.value });
+            }, { signal });
+        }
+
+        const termActions = document.querySelector('.term-actions');
+        if (termActions) {
+            termActions.addEventListener('click', (e) => {
+                const btn = e.target.closest('.btn-icon');
+                if (!btn) return;
+                const title = btn.getAttribute('title');
+                if (title === 'Limpiar Vista') {
+                    const events = DiagnosticState.events;
+                    const maxSeq = events.length > 0 ? events[events.length - 1].sequence : null;
+                    UIState.updateTerminalSettings({ clearedThroughSequence: maxSeq });
+                } else if (title === 'Exportar JSON') {
+                    this._exportDiagnostics();
+                }
+            }, { signal });
+        }
+    }
+
+    _setupSubscriptions() {
+        const unsubState = EventBus.on('STATE_CHANGED', (state) => this._renderState(state));
+        this.subscriptions.push(unsubState);
+
+        const unsubDiag = EventBus.on('DIAGNOSTIC_UPDATED', () => this._renderTerminal());
+        this.subscriptions.push(unsubDiag);
+    }
+
+    _renderState(state) {
+        const navItems = document.querySelectorAll('.nav-item');
+        const moduleMapReverse = {
+            'dashboard': 'dashboard', 'map': 'mapa', 'fleet': 'flota',
+            'packages': 'paquetes', 'assignments': 'asignaciones', 
+            'routes': 'rutas', 'capacity': 'capacidad', 'validation': 'validación'
+        };
+        navItems.forEach(item => {
+            let isActive = false;
+            if (item.dataset.module) {
+                isActive = (state.activeModule === item.dataset.module);
+            } else {
+                const textEl = item.querySelector('.nav-text');
+                if (textEl) {
+                    isActive = (moduleMapReverse[state.activeModule] === textEl.textContent.trim().toLowerCase());
+                }
+            }
+            if (isActive) item.classList.add('active');
+            else item.classList.remove('active');
+        });
+
+        const titleEl = document.querySelector('.workspace-title');
+        if (titleEl) {
+            const titles = {
+                'dashboard': 'Resumen del Escenario', 'map': 'Visualización Geográfica',
+                'fleet': 'Gestión de Flota', 'packages': 'Catálogo de Paquetes',
+                'assignments': 'Asignaciones', 'routes': 'Rutas',
+                'capacity': 'Capacidad', 'validation': 'Validación de Integridad'
+            };
+            titleEl.textContent = titles[state.activeModule] || 'GeoWorkbench';
+        }
+
+        if (state.activeModule === 'dashboard') this._renderDashboard();
+        
+        // Solo renderizamos la terminal si ya está inicializada
+        if (this._isInitialized) this._renderTerminal(); 
+    }
+
+    _renderDashboard() {
+        try {
+            const viewModel = dashboardAdapter.project(ScenarioState.summary, ScenarioState.vehicles);
+            const vmString = JSON.stringify(viewModel);
+            if (this._lastDashboardViewModel === vmString) return;
+
+            if (Dashboard.render(viewModel)) this._lastDashboardViewModel = vmString;
+        } catch (error) {
+            diagnosticCoordinator.log('error', 'DashboardAdapter', 'PROJECTION_FAILED', 'Falló la proyección del Dashboard.', { error: error.message });
+        }
+    }
+
+    _renderTerminal() {
+        try {
+            const prefs = UIState.terminal;
+            const viewModel = terminalAdapter.project(DiagnosticState.events, prefs);
+            const vmString = JSON.stringify(viewModel);
+            if (this._lastTerminalViewModel === vmString) return;
+
+            if (Terminal.render(viewModel)) this._lastTerminalViewModel = vmString;
+        } catch (error) {
+            console.error('[App] Error al proyectar datos para la Terminal:', error);
+        }
+    }
+
+    _exportDiagnostics() {
+        try {
+            const snapshot = DiagnosticState.getSnapshot();
+            const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `geoworkbench_diagnostics_${Date.now()}.json`;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        } catch (error) {
+            console.error('[App] Error al exportar:', error);
+        }
+    }
+
+    destroy() {
+        Dashboard.destroy();
+        Terminal.destroy();
+        if (this.subscriptions.length > 0) {
+            this.subscriptions.forEach(unsubscribe => unsubscribe());
+            this.subscriptions = [];
+        }
+        if (this.abortController) {
+            this.abortController.abort();
+            this.abortController = null;
+        }
+        this._isInitialized = false;
+    }
+}
+
+const app = new GeoWorkbenchApp();
+window.GeoWorkbench = app;
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => app.init());
+} else {
+    app.init();
+}

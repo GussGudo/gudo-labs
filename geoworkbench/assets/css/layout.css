@@ -1,0 +1,54 @@
+.app-container {
+    display: grid;
+    grid-template-columns: 240px 1fr 320px;
+    grid-template-rows: 48px 1fr 200px;
+    grid-template-areas: 
+        "topbar topbar topbar"
+        "nav workspace context"
+        "terminal terminal terminal";
+    height: 100vh;
+    width: 100vw;
+    transition: grid-template-columns 0.2s ease-in-out;
+}
+
+/* H-02: Prevención de desbordamientos en Grid */
+.workspace, .context-panel, .terminal {
+    min-width: 0;
+}
+
+/* ZONA 1 */
+.top-bar { grid-area: topbar; background-color: var(--bg-panel); border-bottom: 1px solid var(--border-default); display: flex; align-items: center; justify-content: space-between; padding: 0 var(--space-4); }
+
+/* ZONA 2 */
+.sidebar { grid-area: nav; background-color: var(--bg-panel); border-right: 1px solid var(--border-default); display: flex; flex-direction: column; padding: var(--space-2) 0; width: 100%; overflow: hidden; }
+
+/* ZONA 3 */
+.workspace { grid-area: workspace; background-color: var(--bg-canvas); padding: var(--space-6); overflow-y: auto; }
+
+/* ZONA 4 */
+.context-panel { grid-area: context; background-color: var(--bg-panel); border-left: 1px solid var(--border-default); display: flex; flex-direction: column; }
+
+/* ZONA 5 */
+.terminal { grid-area: terminal; background-color: #0b0e12; border-top: 1px solid var(--border-default); display: flex; flex-direction: column; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .app-container {
+        grid-template-columns: 48px 1fr 320px;
+    }
+    .nav-text { display: none; }
+    .nav-item { justify-content: center; padding: var(--space-2) 0; position: relative; }
+    .nav-item.active { border-left: none; border-bottom: 2px solid var(--accent-brand); }
+    .nav-badge { position: absolute; top: 2px; right: 2px; padding: 0 3px; font-size: 9px; }
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        grid-template-columns: 48px 1fr;
+        grid-template-areas: 
+            "topbar topbar"
+            "nav workspace"
+            "terminal terminal";
+    }
+    .context-panel { display: none; }
+}

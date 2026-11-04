@@ -1,0 +1,99 @@
+/* Contenedor de la tabla de rutas */
+.routes-table-container {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 500px;
+    width: 100%;
+}
+
+/* Tabla */
+.routes-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    text-align: left;
+    min-width: 700px;
+}
+
+.routes-table th {
+    background-color: var(--bg-elevated);
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--border-default);
+    font-size: 11px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.routes-table td {
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--border-default);
+    vertical-align: middle;
+}
+
+.routes-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Anchos de columna */
+.routes-table .col-vehicle { font-family: var(--font-mono); font-weight: 600; width: 80px; }
+.routes-table .col-stops { font-family: var(--font-mono); width: 80px; }
+.routes-table .col-sequence { font-family: var(--font-mono); font-size: 11px; }
+
+/* Fila de detalle (expandida) */
+.route-detail-row td {
+    background-color: var(--bg-canvas);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border-default);
+}
+
+.sequence-full {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    word-break: break-word;
+    padding: var(--space-2);
+    background-color: var(--bg-elevated);
+    border-radius: var(--radius-sm);
+}
+
+/* Botón de expansión */
+.route-toggle {
+    background: none;
+    border: none;
+    color: var(--accent-brand);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0 var(--space-2) 0 0;
+    margin-right: var(--space-2);
+    font-family: var(--font-mono);
+    vertical-align: middle;
+}
+
+.route-toggle:hover {
+    color: var(--text-primary);
+}
+
+/* Resumen de secuencia */
+.sequence-summary {
+    color: var(--text-secondary);
+    font-size: 11px;
+}
+
+/* Fila principal de ruta */
+.route-row {
+    transition: background-color 0.15s;
+}
+
+/* Hover con turquesa institucional */
+.route-row:hover {
+    background-color: rgba(85, 182, 168, 0.05);
+}

@@ -1,0 +1,113 @@
+/* =========================================
+   Estilos para el módulo de Flota
+   ========================================= */
+
+/* Ocultar visualmente sin afectar a lectores de pantalla */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.fleet-table-container {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    overflow-x: auto; /* Permite scroll horizontal en pantallas pequeñas */
+}
+
+.fleet-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    text-align: left;
+    min-width: 700px; /* Asegura que las columnas no se aplasten */
+}
+
+.fleet-table th {
+    background-color: var(--bg-elevated);
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--border-default);
+    font-size: 11px;
+}
+
+.fleet-table td {
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--border-default);
+    vertical-align: middle;
+}
+
+.fleet-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Columnas */
+.fleet-table .col-id { font-family: var(--font-mono); font-weight: 600; width: 60px; }
+.fleet-table .col-type { color: var(--text-secondary); width: 120px; }
+.fleet-table .col-progress { width: 180px; }
+.fleet-table .col-stats { font-family: var(--font-mono); text-align: center; width: 80px; }
+
+/* Badges de Estado */
+.fleet-status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Identidad visual turquesa */
+.badge-active { 
+    background-color: rgba(85, 182, 168, 0.15); /* #55B6A8 */
+    color: var(--accent-brand); 
+}
+
+.badge-warn { 
+    background-color: rgba(228, 182, 93, 0.15); /* #E4B65D */
+    color: var(--state-warning); 
+}
+
+/* Color derivado de --state-error (#D97777) */
+.badge-inactive { 
+    background-color: rgba(217, 119, 119, 0.15); 
+    color: var(--state-error); 
+}
+
+/* Barras de Progreso Pequeñas */
+.fleet-progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+}
+
+.progress-track-sm {
+    height: 6px;
+    background-color: var(--bg-elevated);
+    border-radius: 3px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.progress-fill-sm {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+/* Utilidades de color para barras */
+.bg-warning { background-color: var(--state-warning); }
+.bg-accent { background-color: var(--accent-brand); }

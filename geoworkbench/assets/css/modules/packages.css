@@ -1,0 +1,70 @@
+/* Contenedor de la tabla con scroll */
+.packages-table-container {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 500px;
+    width: 100%;
+}
+
+/* Tabla */
+.packages-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    text-align: left;
+    min-width: 600px;
+}
+
+.packages-table th {
+    background-color: var(--bg-elevated);
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--border-default);
+    font-size: 11px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.packages-table td {
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--border-default);
+    vertical-align: middle;
+}
+
+.packages-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Anchos de columna */
+.packages-table .col-id { font-family: var(--font-mono); font-weight: 600; width: 100px; }
+.packages-table .col-weight { font-family: var(--font-mono); width: 100px; }
+.packages-table .col-vol { font-family: var(--font-mono); width: 120px; }
+.packages-table .col-vehicle { font-family: var(--font-mono); color: var(--accent-brand); width: 80px; }
+
+/* Resumen (PM-06: fuera del scroll, arriba de la tabla) */
+.packages-summary {
+    padding: var(--space-2) var(--space-3);
+    background-color: var(--bg-panel);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    border: 1px solid var(--border-default);
+    border-bottom: none;
+    border-top-left-radius: var(--radius-md);
+    border-top-right-radius: var(--radius-md);
+    margin-bottom: 0;
+}
+
+/* PM-07: Evitar borde duplicado entre resumen y tabla */
+.packages-summary + .packages-table-container {
+    border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
