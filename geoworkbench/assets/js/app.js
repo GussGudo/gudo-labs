@@ -21,6 +21,7 @@ import { validationAdapter } from './adapters/validation-adapter.js'; // NUEVO: 
 import { generateSyntheticMap } from './data/synthetic-map.js';
 import { generateSyntheticPackages } from './data/synthetic-packages.js';
 import { diagnosticCoordinator } from './services/diagnostic-coordinator.js';
+import { queryScenario } from './adapters/application-layer-adapter.js';
 
 class GeoWorkbenchApp {
     constructor() {
@@ -68,6 +69,8 @@ class GeoWorkbenchApp {
             this._bindDomEvents(this.abortController.signal);
             this._setupSubscriptions();
             this._renderState(UIState);
+            // Conexión inicial con FlowCore (Application Layer)
+            this._syncGovernance();
 
             this._isInitialized = true;
             diagnosticCoordinator.log('info', 'App', 'INIT_SUCCESS', 'Aplicación inicializada correctamente.');
@@ -395,6 +398,26 @@ class GeoWorkbenchApp {
             setTimeout(() => URL.revokeObjectURL(url), 1000);
         } catch (error) {
             console.error('[App] Error al exportar:', error);
+        }
+    }
+
+        async _syncGovernance() {
+        try {
+            const res = await queryScenario({
+                scenarioId: 's1',
+                include: ['activeProposals', 'activeAssignments'],
+                token: 'test-token-planner'
+            });
+            
+            if (res.status === 'success') {
+                const proposals = res.data.activeProposals || [];
+                const assignments = res.data.activeAssignments || [];
+                diagnosticCoordinator.log('info', 'FlowCore', 'SYNC_SUCCESS', `Sincronizadas ${proposals.length} propuestas y ${assignments.length} asignaciones desde el backend.`);
+            } else {
+                diagnosticCoordinator.log('warning', 'FlowCore', 'SYNC_FAILED', `Error de gobernanza: ${res.error.code}`);
+            }
+        } catch (e) {
+            diagnosticCoordinator.log('error', 'FlowCore', 'NETWORK_ERROR', 'Backend no disponible.');
         }
     }
 
