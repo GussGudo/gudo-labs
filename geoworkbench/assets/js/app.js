@@ -38,6 +38,7 @@ class GeoWorkbenchApp {
         this._lastValidationViewModel = null; // NUEVO: VALIDACIÓN
         this._syntheticMap = null;
         this._syntheticPackages = null;
+        this._governanceData = null;
     }
 
     init() {
@@ -236,7 +237,7 @@ class GeoWorkbenchApp {
 
     _renderDashboard() {
         try {
-            const viewModel = dashboardAdapter.project(ScenarioState.summary, ScenarioState.vehicles);
+            const viewModel = dashboardAdapter.project(ScenarioState.summary, ScenarioState.vehicles, this._governanceData);
             const vmString = JSON.stringify(viewModel);
             if (this._lastDashboardViewModel === vmString) return;
             if (Dashboard.render(viewModel)) this._lastDashboardViewModel = vmString;
@@ -401,7 +402,7 @@ class GeoWorkbenchApp {
         }
     }
 
-        async _syncGovernance() {
+    async _syncGovernance() {
         try {
             const res = await queryScenario({
                 scenarioId: 's1',
@@ -410,9 +411,15 @@ class GeoWorkbenchApp {
             });
             
             if (res.status === 'success') {
+                this._governanceData = res.data;
                 const proposals = res.data.activeProposals || [];
                 const assignments = res.data.activeAssignments || [];
                 diagnosticCoordinator.log('info', 'FlowCore', 'SYNC_SUCCESS', `Sincronizadas ${proposals.length} propuestas y ${assignments.length} asignaciones desde el backend.`);
+
+                if (UIState.activeModule === 'dashboard') {
+                    this._lastDashboardViewModel = null;
+                    this._renderDashboard();
+                }
             } else {
                 diagnosticCoordinator.log('warning', 'FlowCore', 'SYNC_FAILED', `Error de gobernanza: ${res.error.code}`);
             }

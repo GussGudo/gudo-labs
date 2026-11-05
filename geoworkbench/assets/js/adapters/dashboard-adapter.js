@@ -85,25 +85,68 @@ class DashboardAdapter {
      * @returns {Object} DashboardViewModel { kpis: [], vehicles: [] }
      * @throws {TypeError} Si las entradas violan la estructura mínima o los estados son desconocidos.
      */
-    static project(summary, vehicles) {
-        // 1. Validar la frontera de entrada
+    static project(summary, vehicles, governanceData = null) {
+        // 1. Validar la frontera de entrada existente
         this.#validateInputs(summary, vehicles);
 
-        // 2. Proyección de KPIs
+        // 2. Validar la entrada opcional de gobernanza
+        if (
+            governanceData !== null &&
+            (
+                typeof governanceData !== 'object' ||
+                Array.isArray(governanceData)
+            )
+        ) {
+            throw new TypeError(
+                '[DashboardAdapter] governanceData debe ser un objeto válido o null.'
+            );
+        }
+
+        const activeProposals = governanceData?.activeProposals ?? [];
+
+        if (!Array.isArray(activeProposals)) {
+            throw new TypeError(
+                '[DashboardAdapter] governanceData.activeProposals debe ser un arreglo.'
+            );
+        }
+
+        for (let i = 0; i < activeProposals.length; i++) {
+            const proposal = activeProposals[i];
+
+            if (
+                !proposal ||
+                typeof proposal !== 'object' ||
+                Array.isArray(proposal) ||
+                typeof proposal.status !== 'string'
+            ) {
+                throw new TypeError(
+                    `[DashboardAdapter] activeProposals[${i}] tiene una estructura inválida.`
+                );
+            }
+        }
+
+        // 3. Proyección de KPIs
+        const activeProposalCount = activeProposals.filter(
+            proposal =>
+                proposal.status === 'PROPOSED' ||
+                proposal.status === 'AUTHORIZED'
+        ).length;
+
         const kpis = [
             { label: 'Paquetes', value: String(summary.totalPackages) },
             { label: 'Paradas', value: String(summary.totalStops) },
             { label: 'Vehículos asignados', value: `${summary.assignedVehicles} / ${summary.totalVehicles}` },
-            { label: 'Distancia total', value: `${summary.totalDistanceKm.toFixed(2)} km` }
+            { label: 'Distancia total', value: `${summary.totalDistanceKm.toFixed(2)} km` },
+            { label: 'Propuestas activas', value: String(activeProposalCount) }
         ];
 
-        // 3. Proyección de Vehículos
+        // 4. Proyección de Vehículos
         const projectedVehicles = vehicles.map(v => {
             return {
                 id: v.id,
                 type: v.type,
                 vol: v.metrics.volPercentage,
-                status: this.#projectStatus(v) 
+                status: this.#projectStatus(v)
             };
         });
 
