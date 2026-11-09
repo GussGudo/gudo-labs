@@ -1,2 +1,5 @@
 **/target/
 application-layer/target/
+
+# Baseline de capturas HTTP — artefactos efímeros de verificación
+baseline/
